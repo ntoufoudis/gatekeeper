@@ -103,6 +103,30 @@ class DefinitionLoader
         return $instances;
     }
 
+    /**
+     * @param  RoleDefinition[]  $roles
+     * @param  string[]  $knownPermissions
+     * @return string[] warning messages
+     */
+    public function validateRolePermissions(array $roles, array $knownPermissions): array
+    {
+        $warnings = [];
+
+        foreach ($roles as $role) {
+            foreach ($role->permissions() as $permission) {
+                if (! in_array($permission, $knownPermissions, true)) {
+                    $warnings[] = sprintf(
+                        'Role "%s" references unknown permission "%s".',
+                        $role->name,
+                        $permission
+                    );
+                }
+            }
+        }
+
+        return $warnings;
+    }
+
     private function requireFile(string $path): void
     {
         try {
